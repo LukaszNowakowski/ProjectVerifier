@@ -14,14 +14,15 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-Parser.Default.ParseArguments<RunOptions>(args)
-    .WithParsed<RunOptions>(o =>
-    {
-        var worker = ExecuteAsync(host.Services, o);
-        worker.Wait();
-    });
+var parsedInputParameters = Parser.Default.ParseArguments<RunOptions>(args);
+if (parsedInputParameters.Tag == ParserResultType.Parsed)
+{
+    await ExecuteAsync(host.Services, parsedInputParameters.Value);
+}
 
-static Task ExecuteAsync(IServiceProvider hostProvider, RunOptions runOptions)
+Console.ReadLine();
+
+static async Task ExecuteAsync(IServiceProvider hostProvider, RunOptions runOptions)
 {
     try
     {
@@ -33,7 +34,7 @@ static Task ExecuteAsync(IServiceProvider hostProvider, RunOptions runOptions)
             runOptions.ProjectPath,
             runOptions.OutputPath);
         var applicationEngine = serviceProvider.GetRequiredService<IApplicationEngine>();
-        return applicationEngine.RunAsync(workParameters, CancellationToken.None);
+        await applicationEngine.RunAsync(workParameters, CancellationToken.None);
     }
     catch (Exception ex)
     {

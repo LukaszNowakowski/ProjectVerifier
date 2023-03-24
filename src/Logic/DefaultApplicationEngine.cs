@@ -31,7 +31,7 @@ public class DefaultApplicationEngine : IApplicationEngine
                 cancellationToken);
             await foreach (var project in projects.WithCancellation(cancellationToken))
             {
-                this.logger.LogDebug("Found project {ProjectPath}", project.RelativePath);
+                this.logger.LogDebug("Found '{ProjectType}' named  '{ProjectName}'", project.TypeName, project.DisplayName);
             }
         }
         catch (Exception ex)

@@ -16,12 +16,17 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
     private static readonly Regex ProjectInformationParser = new Regex(
         "Project\\(\\\"\\{([A-Z0-9]{8}\\-[A-Z0-9]{4}\\-[A-Z0-9]{4}\\-[A-Z0-9]{4}\\-[A-Z0-9]{12})\\}\\\"\\) = \\\"([\\w\\ \\.]*)\\\", \\\"([\\w\\ \\.\\\\]*)\\\", \\\"\\{([A-Z0-9]{8}\\-[A-Z0-9]{4}\\-[A-Z0-9]{4}\\-[A-Z0-9]{4}\\-[A-Z0-9]{12})\\}\\\"",
         RegexOptions.Compiled);
-    
+
     private readonly IFileSystem fileSystem;
 
-    public DefaultSolutionAnalyzer(IFileSystem fileSystem)
+    private readonly IProjectTypeTranslator projectTypeTranslator;
+
+    public DefaultSolutionAnalyzer(
+        IFileSystem fileSystem,
+        IProjectTypeTranslator projectTypeTranslator)
     {
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        this.projectTypeTranslator = projectTypeTranslator ?? throw new ArgumentNullException(nameof(projectTypeTranslator));
     }
 
     public async IAsyncEnumerable<SolutionItem> GetProjectsAsync(
@@ -38,7 +43,8 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
         while (this.IsProjectStart(solutionFileLinesEnumerator.Current!))
         {
             var project = this.ReadProject(solutionFileLinesEnumerator);
-            yield return new SolutionItem(project.Path);
+            var typeName = this.projectTypeTranslator.GetProjectTypeName(project.ProjectTypeGuid) ?? "---";
+            yield return new SolutionItem(project.ProjectId, project.Name, project.Path, typeName);
         }
     }
 
@@ -83,7 +89,8 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
         do
         {
             solutionFileEnumerator.MoveNext();
-        } while (!solutionFileEnumerator.Current!.StartsWith("endproject", StringComparison.InvariantCultureIgnoreCase));
+        } while (!solutionFileEnumerator.Current!.StartsWith("endproject",
+                     StringComparison.InvariantCultureIgnoreCase));
 
         solutionFileEnumerator.MoveNext();
         return new ProjectEntry(projectTypeId, name, path, projectId);
@@ -102,13 +109,13 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
             this.Path = path;
             this.ProjectId = projectId;
         }
-        
+
         public Guid ProjectTypeGuid { get; }
 
         public string Name { get; }
 
         public string Path { get; }
-        
-        public Guid ProjectId { get; } 
+
+        public Guid ProjectId { get; }
     }
 }
