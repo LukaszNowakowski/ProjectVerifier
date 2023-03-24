@@ -34,10 +34,9 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
         this.projectTypeTranslator = projectTypeTranslator ?? throw new ArgumentNullException(nameof(projectTypeTranslator));
     }
 
-    public async IAsyncEnumerable<SolutionItem> GetProjectsAsync(
+    public IEnumerable<SolutionItem> GetProjectsAsync(
         string solutionDirectory,
-        string solutionFile,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+        string solutionFile)
     {
         var solution = new Solution(solutionDirectory, solutionFile);
         var fullSolutionPath = this.fileSystem.Path.Combine(solution.Directory, solution.FileName);

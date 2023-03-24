@@ -20,19 +20,20 @@ public class DefaultApplicationEngine : IApplicationEngine
         this.solutionAnalyzer = solutionAnalyzer ?? throw new ArgumentNullException(nameof(solutionAnalyzer));
     }
 
-    public async Task RunAsync(WorkParameters parameters, CancellationToken cancellationToken)
+    public Task RunAsync(WorkParameters parameters, CancellationToken cancellationToken)
     {
         try
         {
             this.logger.LogDebug("Start application execution.");
             var projects = this.solutionAnalyzer.GetProjectsAsync(
                 parameters.SolutionDirectory,
-                parameters.SolutionFile,
-                cancellationToken);
-            await foreach (var project in projects.WithCancellation(cancellationToken))
+                parameters.SolutionFile);
+            foreach (var project in projects)
             {
                 this.logger.LogDebug("Found '{ProjectType}' named  '{ProjectName}'", project.TypeName, project.DisplayName);
             }
+
+            return Task.CompletedTask;
         }
         catch (Exception ex)
         {
