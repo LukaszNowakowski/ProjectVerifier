@@ -1,8 +1,7 @@
 ﻿using AxaItSolutions.Tools.Migrations.ProjectVerifier;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
 using CommandLine;
-
-using Logic;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

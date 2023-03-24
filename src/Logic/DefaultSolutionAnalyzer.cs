@@ -1,4 +1,4 @@
-﻿namespace Logic;
+﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
 using System;
 using System.Collections.Generic;
@@ -9,12 +9,17 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Logic.SolutionAnalyzer;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionTreeBuilder;
 
 public class DefaultSolutionAnalyzer : ISolutionAnalyzer
 {
     private static readonly Regex ProjectInformationParser = new Regex(
         "Project\\(\\\"\\{([A-Z0-9]{8}\\-[A-Z0-9]{4}\\-[A-Z0-9]{4}\\-[A-Z0-9]{4}\\-[A-Z0-9]{12})\\}\\\"\\) = \\\"([\\w\\ \\.]*)\\\", \\\"([\\w\\ \\.\\\\]*)\\\", \\\"\\{([A-Z0-9]{8}\\-[A-Z0-9]{4}\\-[A-Z0-9]{4}\\-[A-Z0-9]{4}\\-[A-Z0-9]{12})\\}\\\"",
+        RegexOptions.Compiled);
+
+    private static readonly Regex GuidParser = new Regex(
+        @"\w{8}\-\w{4}\-\w{4}-\w{4}-\w{12}",
         RegexOptions.Compiled);
 
     private readonly IFileSystem fileSystem;
@@ -46,6 +51,8 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
             var typeName = this.projectTypeTranslator.GetProjectTypeName(project.ProjectTypeGuid) ?? "---";
             yield return new SolutionItem(project.ProjectId, project.Name, project.Path, typeName);
         }
+
+        var nesting = this.ReadNesting(solutionFileLinesEnumerator);
     }
 
     private void SkipHeaderLines(IEnumerator<string> enumerator)
@@ -64,6 +71,16 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
     private bool IsProjectStart(string contents)
     {
         return contents.StartsWith("project", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    private bool IsNestingStart(string contents)
+    {
+        return contents.Contains("globalsection(nestedprojects)", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    private bool IsGlobalSectionEnd(string contents)
+    {
+        return contents.Contains("endglobalsection", StringComparison.InvariantCultureIgnoreCase);
     }
 
     private ProjectEntry ReadProject(IEnumerator<string> solutionFileEnumerator)
@@ -94,6 +111,35 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
 
         solutionFileEnumerator.MoveNext();
         return new ProjectEntry(projectTypeId, name, path, projectId);
+    }
+
+    private IEnumerable<TreeItem> ReadNesting(IEnumerator<string> solutionFile)
+    {
+        if (!solutionFile.Current!.Equals("global", StringComparison.InvariantCultureIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                $"Expected 'Global' section of solution file, '{solutionFile.Current}' found");
+        }
+
+        while (!this.IsNestingStart(solutionFile.Current!))
+        {
+            solutionFile.MoveNext();
+        }
+
+        solutionFile.MoveNext();
+        while (!this.IsGlobalSectionEnd(solutionFile.Current!))
+        {
+            yield return this.ReadTreeItem(solutionFile.Current!);
+            solutionFile.MoveNext();
+        }
+    }
+
+    private TreeItem ReadTreeItem(string content)
+    {
+        var matches = GuidParser.Matches(content);
+        var child = Guid.Parse(matches[0].Value);
+        var parent = Guid.Parse(matches[1].Value);
+        return new TreeItem(child, parent);
     }
 
     private class ProjectEntry

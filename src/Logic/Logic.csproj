@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <AssemblyName>AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic</AssemblyName>
+        <RootNamespace>AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic</RootNamespace>
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>

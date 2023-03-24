@@ -1,4 +1,4 @@
-﻿namespace Logic.SolutionAnalyzer;
+﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 
 public class Solution
 {

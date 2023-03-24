@@ -1,10 +1,10 @@
-﻿namespace Logic;
+﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Logic.SolutionAnalyzer;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 
 public interface ISolutionAnalyzer
 {
