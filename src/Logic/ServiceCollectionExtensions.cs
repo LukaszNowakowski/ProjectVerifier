@@ -10,7 +10,8 @@ public static class ServiceCollectionExtensions
         services
             .AddSingleton<IApplicationEngine, DefaultApplicationEngine>()
             .AddSingleton<ISolutionAnalyzer, DefaultSolutionAnalyzer>()
-            .AddSingleton<IProjectTypeTranslator, DefaultProjectTypeTranslator>();
+            .AddSingleton<IProjectTypeTranslator, DefaultProjectTypeTranslator>()
+            .AddTransient<ISolutionTreeBuilder, DefaultSolutionTreeBuilder>();
         return services;
     }
 }

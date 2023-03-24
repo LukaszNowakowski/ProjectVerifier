@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
@@ -26,15 +27,19 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
 
     private readonly IProjectTypeTranslator projectTypeTranslator;
 
+    private readonly ISolutionTreeBuilder solutionTreeBuilder;
+
     public DefaultSolutionAnalyzer(
         IFileSystem fileSystem,
-        IProjectTypeTranslator projectTypeTranslator)
+        IProjectTypeTranslator projectTypeTranslator,
+        ISolutionTreeBuilder solutionTreeBuilder)
     {
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         this.projectTypeTranslator = projectTypeTranslator ?? throw new ArgumentNullException(nameof(projectTypeTranslator));
+        this.solutionTreeBuilder = solutionTreeBuilder ?? throw new ArgumentNullException(nameof(solutionTreeBuilder));
     }
 
-    public IEnumerable<SolutionItem> GetProjectsAsync(
+    public TreeNode GetProjectsAsync(
         string solutionDirectory,
         string solutionFile)
     {
@@ -44,14 +49,23 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
             .GetEnumerator();
         solutionFileLinesEnumerator.MoveNext();
         this.SkipHeaderLines(solutionFileLinesEnumerator);
-        while (this.IsProjectStart(solutionFileLinesEnumerator.Current!))
+
+        var solutionItems = this.ReadSolutionItems(solutionFileLinesEnumerator)
+            .ToList();
+        var nesting = this.ReadNesting(solutionFileLinesEnumerator)
+            .ToList();
+        var tree = this.solutionTreeBuilder.BuildSolutionTree(nesting, solutionItems);
+        return tree;
+    }
+
+    private IEnumerable<SolutionItem> ReadSolutionItems(IEnumerator<string> solutionFile)
+    {
+        while (this.IsProjectStart(solutionFile.Current!))
         {
-            var project = this.ReadProject(solutionFileLinesEnumerator);
+            var project = this.ReadProject(solutionFile);
             var typeName = this.projectTypeTranslator.GetProjectTypeName(project.ProjectTypeGuid) ?? "---";
             yield return new SolutionItem(project.ProjectId, project.Name, project.Path, typeName);
-        }
-
-        var nesting = this.ReadNesting(solutionFileLinesEnumerator);
+        }        
     }
 
     private void SkipHeaderLines(IEnumerator<string> enumerator)

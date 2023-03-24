@@ -4,6 +4,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionTreeBuilder;
+
 using Microsoft.Extensions.Logging;
 
 public class DefaultApplicationEngine : IApplicationEngine
@@ -25,14 +27,10 @@ public class DefaultApplicationEngine : IApplicationEngine
         try
         {
             this.logger.LogDebug("Start application execution.");
-            var projects = this.solutionAnalyzer.GetProjectsAsync(
+            var treeRoot = this.solutionAnalyzer.GetProjectsAsync(
                 parameters.SolutionDirectory,
                 parameters.SolutionFile);
-            foreach (var project in projects)
-            {
-                this.logger.LogDebug("Found '{ProjectType}' named  '{ProjectName}'", project.TypeName, project.DisplayName);
-            }
-
+            // DisplayTreeNode(treeRoot, 0);
             return Task.CompletedTask;
         }
         catch (Exception ex)
@@ -40,6 +38,15 @@ public class DefaultApplicationEngine : IApplicationEngine
             Console.WriteLine(ex.Message);
             Console.WriteLine(ex.StackTrace);
             throw;
+        }
+    }
+
+    private void DisplayTreeNode(TreeNode node, int level)
+    {
+        Console.WriteLine(node.Item.DisplayName);
+        foreach (var child in node.Children)
+        {
+            this.DisplayTreeNode(child, level + 1);
         }
     }
 }
