@@ -13,18 +13,13 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddServices(args);
     })
     .Build();
-var cancellationTokenSource = new CancellationTokenSource();
-#pragma warning disable CS4014
-Parser.Default.ParseArguments<RunOptions>(args)
-    .WithParsedAsync<RunOptions>(async o =>
-#pragma warning restore CS4014
-    {
-        await ExecuteAsync(host.Services, o)
-            .ConfigureAwait(false);
-        cancellationTokenSource.Cancel();
-    });
 
-await host.RunAsync(cancellationTokenSource.Token);
+Parser.Default.ParseArguments<RunOptions>(args)
+    .WithParsed<RunOptions>(o =>
+    {
+        var worker = ExecuteAsync(host.Services, o);
+        worker.Wait();
+    });
 
 static Task ExecuteAsync(IServiceProvider hostProvider, RunOptions runOptions)
 {

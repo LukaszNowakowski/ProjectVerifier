@@ -1,5 +1,7 @@
 ﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier;
 
+using System.IO.Abstractions;
+
 using Logic;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +12,8 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddLogic()
-            .AddLogging();
+            .AddLogging()
+            .AddScoped<IFileSystem, FileSystem>();
 
         return services;
     }
