@@ -76,8 +76,8 @@ public class DefaultProjectVerifier : IProjectVerifier
                 projectDirectory,
                 "*.*",
                 SearchOption.AllDirectories)
-            .Where(f => !this.fileSystem.Path!.GetDirectoryName(f)!.Contains("\\bin\\"))
-            .Where(f => !this.fileSystem.Path!.GetDirectoryName(f)!.Contains("\\obj\\"))
+            .Where(f => !this.fileSystem.Path!.GetDirectoryName(f)!.Contains("\\bin\\") && !this.fileSystem.Path!.GetDirectoryName(f)!.EndsWith("\\bin"))
+            .Where(f => !this.fileSystem.Path!.GetDirectoryName(f)!.Contains("\\obj\\") && !this.fileSystem.Path!.GetDirectoryName(f)!.EndsWith("\\obj"))
             .Where(f => !this.fileSystem.Path!.GetFileName(f).Equals("project.lock.json", StringComparison.InvariantCultureIgnoreCase))
             .Where(f => !this.fileSystem.Path!.GetFileName(f).Contains(".csproj"))
             .Where(f => !this.fileSystem.Path!.GetFileName(f).Equals("stylecop.cache", StringComparison.InvariantCultureIgnoreCase));
