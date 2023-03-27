@@ -39,7 +39,7 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
         this.solutionTreeBuilder = solutionTreeBuilder ?? throw new ArgumentNullException(nameof(solutionTreeBuilder));
     }
 
-    public TreeNode GetProjectsAsync(
+    public TreeNode BuildProjectsTreeAsync(
         string solutionDirectory,
         string solutionFile)
     {
@@ -57,7 +57,7 @@ public class DefaultSolutionAnalyzer : ISolutionAnalyzer
         var tree = this.solutionTreeBuilder.BuildSolutionTree(nesting, solutionItems);
         return tree;
     }
-
+    
     private IEnumerable<SolutionItem> ReadSolutionItems(IEnumerator<string> solutionFile)
     {
         while (this.IsProjectStart(solutionFile.Current!))

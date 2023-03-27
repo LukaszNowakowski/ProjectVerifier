@@ -8,7 +8,7 @@ using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionTreeBuilder;
 
 public interface ISolutionAnalyzer
 {
-    TreeNode GetProjectsAsync(
+    TreeNode BuildProjectsTreeAsync(
         string solutionDirectory,
         string solutionFile);
 }

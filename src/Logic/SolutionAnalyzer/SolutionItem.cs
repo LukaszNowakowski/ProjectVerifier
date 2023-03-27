@@ -1,7 +1,9 @@
 ﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 
 using System;
+using System.Diagnostics;
 
+[DebuggerDisplay("{DisplayName}")]
 public class SolutionItem
 {
     public SolutionItem(

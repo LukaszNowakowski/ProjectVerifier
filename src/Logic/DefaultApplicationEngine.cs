@@ -27,10 +27,9 @@ public class DefaultApplicationEngine : IApplicationEngine
         try
         {
             this.logger.LogDebug("Start application execution.");
-            var treeRoot = this.solutionAnalyzer.GetProjectsAsync(
+            var treeRoot = this.solutionAnalyzer.BuildProjectsTreeAsync(
                 parameters.SolutionDirectory,
                 parameters.SolutionFile);
-            // DisplayTreeNode(treeRoot, 0);
             return Task.CompletedTask;
         }
         catch (Exception ex)
@@ -38,15 +37,6 @@ public class DefaultApplicationEngine : IApplicationEngine
             Console.WriteLine(ex.Message);
             Console.WriteLine(ex.StackTrace);
             throw;
-        }
-    }
-
-    private void DisplayTreeNode(TreeNode node, int level)
-    {
-        Console.WriteLine(node.Item.DisplayName);
-        foreach (var child in node.Children)
-        {
-            this.DisplayTreeNode(child, level + 1);
         }
     }
 }
