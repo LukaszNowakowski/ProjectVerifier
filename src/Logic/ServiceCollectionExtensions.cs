@@ -1,5 +1,7 @@
 ﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.AnalysisStrategies;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.AnalysisStrategies.NotConnectedProjects;
 using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +15,9 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IApplicationEngine, DefaultApplicationEngine>()
             .AddSingleton<ISolutionAnalyzer, DefaultSolutionAnalyzer>()
             .AddSingleton<IProjectTypeTranslator, DefaultProjectTypeTranslator>()
-            .AddTransient<ISolutionTreeBuilder, DefaultSolutionTreeBuilder>();
+            .AddTransient<ISolutionVerifier, DefaultSolutionVerifier>()
+            .AddSingleton<IAnalysisStrategyFactory, DefaultAnalysisStrategyFactory>()
+            .AddTransient<NotConnectedProjectsStrategy>();
         return services;
     }
 }
