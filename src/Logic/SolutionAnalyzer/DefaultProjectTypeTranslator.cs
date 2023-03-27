@@ -1,4 +1,4 @@
-﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
+﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 
 using System;
 using System.Collections.Generic;

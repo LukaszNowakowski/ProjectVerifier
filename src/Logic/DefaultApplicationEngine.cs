@@ -1,10 +1,13 @@
 ﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionTreeBuilder;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.AnalysisStrategies;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.AnalysisStrategies.NotConnectedProjects;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 
 using Microsoft.Extensions.Logging;
 
@@ -14,12 +17,16 @@ public class DefaultApplicationEngine : IApplicationEngine
 
     private readonly ISolutionAnalyzer solutionAnalyzer;
 
+    private readonly IAnalysisStrategyFactory analysisStrategyFactory;
+
     public DefaultApplicationEngine(
         ILogger<DefaultApplicationEngine> logger,
-        ISolutionAnalyzer solutionAnalyzer)
+        ISolutionAnalyzer solutionAnalyzer,
+        IAnalysisStrategyFactory analysisStrategyFactory)
     {
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         this.solutionAnalyzer = solutionAnalyzer ?? throw new ArgumentNullException(nameof(solutionAnalyzer));
+        this.analysisStrategyFactory = analysisStrategyFactory ?? throw new ArgumentNullException(nameof(analysisStrategyFactory));
     }
 
     public Task RunAsync(WorkParameters parameters, CancellationToken cancellationToken)
@@ -27,9 +34,21 @@ public class DefaultApplicationEngine : IApplicationEngine
         try
         {
             this.logger.LogDebug("Start application execution.");
-            var treeRoot = this.solutionAnalyzer.BuildProjectsTreeAsync(
+            var projects = this.solutionAnalyzer.FetchSolutionProjects(
                 parameters.SolutionDirectory,
                 parameters.SolutionFile);
+
+            var strategy = this.analysisStrategyFactory.Create(parameters);
+            if (strategy is null)
+            {
+                this.logger.LogWarning("No strategies found for given parameters");
+            }
+            else
+            {
+                strategy.RunAnalysis(parameters, projects);
+            }
+
+            Console.WriteLine("COMPLETED");
             return Task.CompletedTask;
         }
         catch (Exception ex)
