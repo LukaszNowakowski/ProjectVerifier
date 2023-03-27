@@ -1,5 +1,7 @@
 ﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
+
 using Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions

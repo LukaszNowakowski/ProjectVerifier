@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionTreeBuilder;
 
 using Microsoft.Extensions.Logging;

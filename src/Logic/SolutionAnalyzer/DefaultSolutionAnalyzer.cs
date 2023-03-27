@@ -1,16 +1,11 @@
-﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
+﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 
 using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
-using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionTreeBuilder;
 
 public class DefaultSolutionAnalyzer : ISolutionAnalyzer
