@@ -1,4 +1,4 @@
-﻿namespace Logic;
+﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +9,9 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddSingleton<IApplicationEngine, DefaultApplicationEngine>()
-            .AddSingleton<ISolutionAnalyzer, DefaultSolutionAnalyzer>();
+            .AddSingleton<ISolutionAnalyzer, DefaultSolutionAnalyzer>()
+            .AddSingleton<IProjectTypeTranslator, DefaultProjectTypeTranslator>()
+            .AddTransient<ISolutionTreeBuilder, DefaultSolutionTreeBuilder>();
         return services;
     }
 }

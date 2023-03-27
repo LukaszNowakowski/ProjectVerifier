@@ -1,4 +1,4 @@
-﻿namespace Logic;
+﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
 public class WorkParameters
 {

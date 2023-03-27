@@ -1,14 +1,11 @@
 ﻿namespace AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
 using System.Collections.Generic;
-using System.Threading;
 
 using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionAnalyzer;
 using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.SolutionTreeBuilder;
 
-public interface ISolutionAnalyzer
+public interface ISolutionTreeBuilder
 {
-    TreeNode BuildProjectsTreeAsync(
-        string solutionDirectory,
-        string solutionFile);
+    TreeNode BuildSolutionTree(IList<TreeItem> nesting, IList<SolutionItem> solutionItems);
 }

@@ -1,8 +1,7 @@
 ﻿using AxaItSolutions.Tools.Migrations.ProjectVerifier;
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic;
 
 using CommandLine;
-
-using Logic;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,20 +12,16 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddServices(args);
     })
     .Build();
-var cancellationTokenSource = new CancellationTokenSource();
-#pragma warning disable CS4014
-Parser.Default.ParseArguments<RunOptions>(args)
-    .WithParsedAsync<RunOptions>(async o =>
-#pragma warning restore CS4014
-    {
-        await ExecuteAsync(host.Services, o)
-            .ConfigureAwait(false);
-        cancellationTokenSource.Cancel();
-    });
 
-await host.RunAsync(cancellationTokenSource.Token);
+var parsedInputParameters = Parser.Default.ParseArguments<RunOptions>(args);
+if (parsedInputParameters.Tag == ParserResultType.Parsed)
+{
+    await ExecuteAsync(host.Services, parsedInputParameters.Value);
+}
 
-static Task ExecuteAsync(IServiceProvider hostProvider, RunOptions runOptions)
+Console.ReadLine();
+
+static async Task ExecuteAsync(IServiceProvider hostProvider, RunOptions runOptions)
 {
     try
     {
@@ -38,7 +33,7 @@ static Task ExecuteAsync(IServiceProvider hostProvider, RunOptions runOptions)
             runOptions.ProjectPath,
             runOptions.OutputPath);
         var applicationEngine = serviceProvider.GetRequiredService<IApplicationEngine>();
-        return applicationEngine.RunAsync(workParameters, CancellationToken.None);
+        await applicationEngine.RunAsync(workParameters, CancellationToken.None);
     }
     catch (Exception ex)
     {
