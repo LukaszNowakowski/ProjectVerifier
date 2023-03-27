@@ -2,6 +2,7 @@
 
 using System;
 
+using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.AnalysisStrategies.NoConnectedFiles;
 using AxaItSolutions.Tools.Migrations.ProjectVerifier.Logic.AnalysisStrategies.NotConnectedProjects;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,6 @@ public class DefaultAnalysisStrategyFactory : IAnalysisStrategyFactory
             return this.serviceProvider.GetService<NotConnectedProjectsStrategy>();
         }
 
-        return null;
+        return this.serviceProvider.GetService<NotConnectedFilesStrategy>();
     }
 }
